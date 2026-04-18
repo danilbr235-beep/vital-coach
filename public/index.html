@@ -1,21 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Soft Goals</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soft Goals Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      max-width: 800px;
+    }
+    form, #filters {
+      margin-bottom: 1rem;
+    }
+    #filters label {
+      margin-right: 1rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 0.5rem;
+    }
+    li.completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+    li span {
+      margin-left: 0.25rem;
+      color: #555;
+    }
+    li div button {
+      margin-left: 0.5rem;
+    }
+  </style>
 </head>
 <body>
   <h1>Soft Goals Manager</h1>
   <form id="goal-form">
-    
-            
-            <input type="text" id="goal-input" placeholder="Enter a new goal" required>
-      <input type="date" id="due-date-input" placeholder="Due date">
-      <input type="text" id="category-input" placeholder="Category">
-    <button type="submit">Add Goal</button>
+    <input id="goal-input" placeholder="Введите цель" />
+    <input type="date" id="due-date-input" />
+    <input id="category-input" placeholder="Категория" />
+    <button type="submit">Добавить</button>
   </form>
+  <!-- Filters section -->
+  <div id="filters">
+    <label>
+      Категория:
+      <select id="filter-category">
+        <option value="">Все</option>
+      </select>
+    </label>
+    <label>
+      <input type="checkbox" id="filter-overdue" /> Просроченные
+    </label>
+    <label>
+      До срока (дней):
+      <input type="number" id="filter-due-within" min="1" />
+    </label>
+    <button type="button" id="apply-filters">Применить фильтры</button>
+  </div>
   <ul id="goals-list"></ul>
-  <script src="new_script.js"></script>
+  <!-- Include the enhanced script -->
+  <script src="new_script_v2.js"></script>
 </body>
 </html>
