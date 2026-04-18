@@ -43,11 +43,14 @@ class TrackPage extends ConsumerWidget {
               title: const Text('Kegel session'),
               subtitle: const Text('Technique + timer (MVP)'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => KegelSessionPage(logStore: logStore),
-                ),
-              ),
+              onTap: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => KegelSessionPage(logStore: logStore),
+                  ),
+                );
+                ref.invalidate(trackLogProvider);
+              },
             ),
           ),
           Card(
@@ -57,11 +60,14 @@ class TrackPage extends ConsumerWidget {
               title: const Text('Pump session'),
               subtitle: const Text('Safety-first timer (MVP)'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PumpSessionPage(logStore: logStore),
-                ),
-              ),
+              onTap: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PumpSessionPage(logStore: logStore),
+                  ),
+                );
+                ref.invalidate(trackLogProvider);
+              },
             ),
           ),
           Card(
@@ -71,11 +77,14 @@ class TrackPage extends ConsumerWidget {
               title: const Text('Recovery reset'),
               subtitle: const Text('5-minute downshift (MVP)'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => RecoveryResetPage(logStore: logStore),
-                ),
-              ),
+              onTap: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => RecoveryResetPage(logStore: logStore),
+                  ),
+                );
+                ref.invalidate(trackLogProvider);
+              },
             ),
           ),
           const SizedBox(height: 10),
