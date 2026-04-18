@@ -4,53 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soft Goals Manager</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      max-width: 800px;
-    }
-    form, #filters {
-      margin-bottom: 1rem;
-    }
-    #filters label {
-      margin-right: 1rem;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 0.5rem;
-    }
-    li.completed {
-      text-decoration: line-through;
-      color: #888;
-    }
-    li span {
-      margin-left: 0.25rem;
-      color: #555;
-    }
-    li div button {
-      margin-left: 0.5rem;
-    }
-  </style>
+  <!-- Подключаем Font Awesome для иконок -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+        integrity="sha512-1hawoHRQ5yAfzh0P3RIPMsR1dLqUGoYwSGtA/RP+ZL7o3IHkLz2zNHdf3YyzCrzm2o4JX4fsbE9fN7Xl+obKdw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+  <!-- Новый стиль -->
+  <link rel="stylesheet" href="styles_v2.css">
 </head>
 <body>
   <h1>Soft Goals Manager</h1>
+  <!-- Форма добавления -->
   <form id="goal-form">
     <input id="goal-input" placeholder="Введите цель" />
     <input type="date" id="due-date-input" />
     <input id="category-input" placeholder="Категория" />
     <button type="submit">Добавить</button>
   </form>
-  <!-- Filters section -->
+
+  <!-- Блок фильтров -->
   <div id="filters">
     <label>
       Категория:
@@ -59,7 +32,8 @@
       </select>
     </label>
     <label>
-      <input type="checkbox" id="filter-overdue" /> Просроченные
+      <input type="checkbox" id="filter-overdue" />
+      Просроченные
     </label>
     <label>
       До срока (дней):
@@ -67,8 +41,14 @@
     </label>
     <button type="button" id="apply-filters">Применить фильтры</button>
   </div>
+
+  <!-- Список целей -->
   <ul id="goals-list"></ul>
-  <!-- Include the enhanced script -->
-  <script src="new_script_v2.js"></script>
+
+  <!-- Контейнер для уведомлений -->
+  <div id="notifications"></div>
+
+  <!-- Улучшенный скрипт -->
+  <script src="new_script_v3.js"></script>
 </body>
 </html>

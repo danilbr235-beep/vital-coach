@@ -1,5 +1,4 @@
-// Enhanced client-side script for Soft Goals Manager
-// Adds editing and filtering functionality
+// Расширенный клиентский скрипт: редактирование, фильтры, уведомления
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('goal-form');
@@ -8,26 +7,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryInput = document.getElementById('category-input');
   const list = document.getElementById('goals-list');
 
-  // Filter UI elements
+  // Элементы фильтров
   const filterCategorySelect = document.getElementById('filter-category');
   const filterOverdueCheckbox = document.getElementById('filter-overdue');
   const filterDueWithinInput = document.getElementById('filter-due-within');
   const applyFiltersBtn = document.getElementById('apply-filters');
 
-  // Local cache of goals to support filtering without extra API calls
+  // Контейнер для уведомлений
+  const notificationsContainer = document.getElementById('notifications');
+
+  // Локальное кэширование задач
   let allGoals = [];
 
-  // Update the category filter options based on current goals
+  // Функция создания уведомлений
+  function showNotification(message, type = 'success') {
+    const notif = document.createElement('div');
+    notif.className = `notification ${type}`;
+    notif.textContent = message;
+    notificationsContainer.appendChild(notif);
+    setTimeout(() => {
+      notif.remove();
+    }, 3000);
+  }
+
+  // Заполнение фильтра по категориям
   function updateCategoryFilterOptions() {
     const categories = new Set();
     allGoals.forEach(goal => {
       if (goal.category) categories.add(goal.category);
     });
-    // Remove old options except the first ("Все")
     while (filterCategorySelect.options.length > 1) {
       filterCategorySelect.remove(1);
     }
-    // Add category options
     categories.forEach(cat => {
       const option = document.createElement('option');
       option.value = cat;
@@ -36,19 +47,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Determine if a goal matches current filters
+  // Проверка совпадения задачи с активными фильтрами
   function goalMatchesFilters(goal) {
-    // Category filter
     const selectedCategory = filterCategorySelect.value;
     if (selectedCategory && goal.category !== selectedCategory) return false;
-    // Overdue filter
     if (filterOverdueCheckbox.checked) {
       if (!goal.dueDate) return false;
       const now = new Date();
       const due = new Date(goal.dueDate);
       if (due >= now) return false;
     }
-    // Due within filter
     const dueWithinValue = filterDueWithinInput.value;
     if (dueWithinValue) {
       const days = parseInt(dueWithinValue, 10);
@@ -63,85 +71,110 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   }
 
-  // Render goals list applying filters
+  // Отрисовка списка задач с учётом фильтров
   function renderGoals() {
     list.innerHTML = '';
+    const now = new Date();
     allGoals.forEach(goal => {
       if (!goalMatchesFilters(goal)) return;
-      const li = document.createElement('li');
-      li.textContent = goal.text;
 
-      // Append category and due date
+      const li = document.createElement('li');
+
+      // Текст цели
+      const textSpan = document.createElement('span');
+      textSpan.textContent = goal.text;
+      li.appendChild(textSpan);
+
+      // Категория
       if (goal.category) {
         const categorySpan = document.createElement('span');
-        categorySpan.textContent = ' (' + goal.category + ')';
+        categorySpan.className = 'meta';
+        categorySpan.textContent = ` (${goal.category})`;
         li.appendChild(categorySpan);
       }
+
+      // Дата выполнения
       if (goal.dueDate) {
-        const dueDateSpan = document.createElement('span');
+        const dueSpan = document.createElement('span');
         const date = new Date(goal.dueDate);
-        dueDateSpan.textContent = ' [Due: ' + date.toLocaleDateString() + ']';
-        li.appendChild(dueDateSpan);
+        dueSpan.className = 'meta';
+        dueSpan.textContent = ` [до: ${date.toLocaleDateString()}]`;
+        li.appendChild(dueSpan);
       }
+
+      // Статусы
       if (goal.completed) {
         li.classList.add('completed');
+      } else if (goal.dueDate && new Date(goal.dueDate) < now) {
+        li.classList.add('overdue');
       }
 
-      // Actions container
+      // Блок кнопок
       const actions = document.createElement('div');
+      actions.className = 'actions';
 
-      // Complete/Undo button
+      // Кнопка завершения/отмены
       const completeBtn = document.createElement('button');
-      completeBtn.textContent = goal.completed ? 'Undo' : 'Complete';
+      completeBtn.innerHTML = goal.completed
+        ? '<i class="fas fa-undo"></i> Отменить'
+        : '<i class="fas fa-check"></i> Завершить';
       completeBtn.addEventListener('click', async () => {
-        await fetch('/api/goals/' + goal.id, {
+        const res = await fetch('/api/goals/' + goal.id, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ completed: !goal.completed })
         });
+        if (res.ok) showNotification(goal.completed ? 'Цель восстановлена' : 'Цель выполнена');
         await fetchGoals();
       });
       actions.appendChild(completeBtn);
 
-      // Edit button
+      // Кнопка редактирования
       const editBtn = document.createElement('button');
-      editBtn.textContent = 'Edit';
+      editBtn.classList.add('edit');
+      editBtn.innerHTML = '<i class="fas fa-edit"></i> Изменить';
       editBtn.addEventListener('click', async e => {
         e.stopPropagation();
-        // Prompt user for new values; use current ones as defaults
         const newText = prompt('Изменить текст цели:', goal.text);
-        if (newText === null) return; // cancelled
-        const newDueDate = prompt('Изменить дату (YYYY-MM-DD) или оставьте пустым для удаления:', goal.dueDate || '');
-        const newCategory = prompt('Изменить категорию или оставьте пустым для удаления:', goal.category || '');
+        if (newText === null) return;
+        const newDueDate = prompt(
+          'Изменить дату (YYYY-MM-DD) или оставьте пустым для удаления:',
+          goal.dueDate || ''
+        );
+        const newCategory = prompt(
+          'Изменить категорию или оставьте пустым для удаления:',
+          goal.category || ''
+        );
         const payload = {};
         if (newText.trim() !== '' && newText !== goal.text) payload.text = newText.trim();
         if (newDueDate !== null) {
           const trimmedDate = newDueDate.trim();
-          if (trimmedDate === '') payload.dueDate = null;
-          else payload.dueDate = trimmedDate;
+          payload.dueDate = trimmedDate === '' ? null : trimmedDate;
         }
         if (newCategory !== null) {
           const trimmedCat = newCategory.trim();
-          if (trimmedCat === '') payload.category = null;
-          else payload.category = trimmedCat;
+          payload.category = trimmedCat === '' ? null : trimmedCat;
         }
         if (Object.keys(payload).length > 0) {
-          await fetch('/api/goals/' + goal.id, {
+          const res = await fetch('/api/goals/' + goal.id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
+          if (res.ok) showNotification('Цель изменена');
           await fetchGoals();
         }
       });
       actions.appendChild(editBtn);
 
-      // Delete button
+      // Кнопка удаления
       const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = 'Delete';
+      deleteBtn.classList.add('delete');
+      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Удалить';
       deleteBtn.addEventListener('click', async e => {
         e.stopPropagation();
-        await fetch('/api/goals/' + goal.id, { method: 'DELETE' });
+        const res = await fetch('/api/goals/' + goal.id, { method: 'DELETE' });
+        if (res.ok) showNotification('Цель удалена', 'error');
         await fetchGoals();
       });
       actions.appendChild(deleteBtn);
@@ -151,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Load goals from the backend and store them locally
+  // Загрузка задач с сервера
   async function fetchGoals() {
     const res = await fetch('/api/goals');
     allGoals = await res.json();
@@ -159,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderGoals();
   }
 
-  // Handle adding a new goal
+  // Добавление новой цели
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const text = input.value.trim();
@@ -169,22 +202,23 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Введите цель');
       return;
     }
-    await fetch('/api/goals', {
+    const res = await fetch('/api/goals', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, dueDate: dueDate || null, category })
     });
+    if (res.ok) showNotification('Цель добавлена');
     input.value = '';
     dueDateInput.value = '';
     categoryInput.value = '';
     await fetchGoals();
   });
 
-  // Apply filters when clicking the button
+  // Применение фильтров
   applyFiltersBtn.addEventListener('click', () => {
     renderGoals();
   });
 
-  // Initial load
+  // Стартовая загрузка
   fetchGoals();
 });
