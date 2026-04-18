@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'sexual_log/sexual_log_pages.dart';
+import 'sexual_log/sexual_log_store.dart';
+
 class VaultPage extends StatelessWidget {
   const VaultPage({super.key});
 
@@ -33,8 +36,14 @@ class VaultPage extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.favorite_border),
                   title: const Text('Sexual wellness log'),
-                  subtitle: const Text('Private entries (coming next)'),
-                  onTap: () {},
+                  subtitle: const Text('Private entries'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          SexualLogListPage(store: SexualLogStore()),
+                    ),
+                  ),
                 ),
               ),
               Card(
