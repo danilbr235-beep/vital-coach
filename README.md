@@ -1,6 +1,17 @@
-# Soft Goals Manager
+# Soft Workspace
 
-This repository contains a personal goals management application. It includes:
+This repo currently contains **two** projects:
+
+- **`/` (root)**: `Soft Goals Manager` — a Node/Express goals demo (legacy)
+- **`vital_coach/`**: `Vital Coach` — the private men's health / life-OS app (**Flutter**, Android + Windows)
+
+---
+
+## Soft Goals Manager (legacy)
+
+This section describes the legacy Node/Express app. (You can keep it, or we can move it into `legacy/` later.)
+
+This application includes:
 
 - A **command-line interface (CLI)** for managing goals via terminal commands.
 - A **RESTful API server** built with Express.js that stores goals in a JSON file.
