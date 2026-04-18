@@ -1,38 +1,108 @@
 #!/usr/bin/env node
 
-/**
- * Entry point for the Soft project.
- *
- * This simple command‑line script prints a greeting message and, if the user
- * provides any numeric arguments, computes their sum. It serves as a
- * demonstration of a Node.js CLI tool that can be easily extended with
- * additional functionality.
- */
-function main() {
-  // Greet the user
-  console.log('Hello from the Soft project!');
+const fs = require('fs');
+const path = require('path');
 
-  // Extract command‑line arguments after the script name
-  const args = process.argv.slice(2);
-  if (args.length > 0) {
-    // Attempt to convert all arguments to numbers
-    const numbers = args.map((arg) => {
-      const num = Number(arg);
-      if (Number.isNaN(num)) {
-        console.warn(`Warning: '${arg}' is not a valid number and will be ignored.`);
-        return 0;
-      }
-      return num;
-    });
-    // Compute the sum of the numbers
-    const sum = numbers.reduce((acc, val) => acc + val, 0);
-    console.log(`Sum of provided numbers: ${sum}`);
-  } else {
-    console.log('Provide numbers as command‑line arguments to compute their sum.');
+const DATA_FILE = path.join(__dirname, 'goals.json');
+
+function loadGoals() {
+  try {
+    const data = fs.readFileSync(DATA_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    return [];
   }
 }
 
-// Run the main function when the script is executed directly
+function saveGoals(goals) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(goals, null, 2));
+}
+
+function addGoal(text) {
+  const goals = loadGoals();
+  const id = Date.now();
+  goals.push({ id, text, completed: false });
+  saveGoals(goals);
+  console.log(`Added goal: ${text}`);
+}
+
+function listGoals() {
+  const goals = loadGoals();
+  if (goals.length === 0) {
+    console.log('No goals found.');
+    return;
+  }
+  goals.forEach((goal, index) => {
+    const status = goal.completed ? '[x]' : '[ ]';
+    console.log(`${index + 1}. ${status} ${goal.text} (id: ${goal.id})`);
+  });
+}
+
+function completeGoal(id) {
+  const goals = loadGoals();
+  const goal = goals.find((g) => g.id === Number(id));
+  if (!goal) {
+    console.log('Goal not found.');
+    return;
+  }
+  goal.completed = true;
+  saveGoals(goals);
+  console.log(`Completed goal: ${goal.text}`);
+}
+
+function deleteGoal(id) {
+  const goals = loadGoals();
+  const index = goals.findIndex((g) => g.id === Number(id));
+  if (index === -1) {
+    console.log('Goal not found.');
+    return;
+  }
+  const [removed] = goals.splice(index, 1);
+  saveGoals(goals);
+  console.log(`Deleted goal: ${removed.text}`);
+}
+
+function showHelp() {
+  console.log(`Usage:
+  soft-cli add <goal description>    Add a new goal
+  soft-cli list                      List all goals
+  soft-cli complete <id>             Mark a goal as completed
+  soft-cli delete <id>               Delete a goal
+
+Examples:
+  soft-cli add \"Learn Node.js\"
+  soft-cli list`);
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const command = args[0];
+  switch (command) {
+    case 'add':
+      const description = args.slice(1).join(' ');
+      if (!description) {
+        console.log('Please provide a goal description.');
+      } else {
+        addGoal(description);
+      }
+      break;
+    case 'list':
+      listGoals();
+      break;
+    case 'complete':
+      completeGoal(args[1]);
+      break;
+    case 'delete':
+      deleteGoal(args[1]);
+      break;
+    case 'help':
+    case '-h':
+    case '--help':
+    default:
+      showHelp();
+  }
+}
+
 if (require.main === module) {
   main();
 }
