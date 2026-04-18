@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../vault/vault_gate_page.dart';
+
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
 
@@ -30,9 +32,13 @@ class MorePage extends StatelessWidget {
             leading: Icon(Icons.face_retouching_natural),
             title: Text('Appearance & routines'),
           ),
-          const ListTile(
-            leading: Icon(Icons.shield_outlined),
-            title: Text('Privacy & vault'),
+          ListTile(
+            leading: const Icon(Icons.shield_outlined),
+            title: const Text('Privacy & vault'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const VaultGatePage()),
+            ),
           ),
           const ListTile(
             leading: Icon(Icons.settings_outlined),
