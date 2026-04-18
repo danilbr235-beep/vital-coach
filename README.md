@@ -1,31 +1,71 @@
-# Soft CLI
+# Soft Goals Manager
 
-This repository contains a simple Node.js command‑line interface (CLI) example. The script prints a greeting message and, if numeric arguments are provided, computes their sum.
+This repository contains a personal goals management application. It includes:
+
+- A **command-line interface (CLI)** for managing goals via terminal commands.
+- A **RESTful API server** built with Express.js that stores goals in a JSON file.
+- A **web front-end** (HTML/CSS/JavaScript) that interacts with the API to add, list, complete and delete goals.
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) version 14 or higher.
 
 ## Installation
 
-To install the dependencies and run the script locally, clone this repository and install Node.js (version 14 or above):
+Clone the repository and install dependencies:
 
-```
+```bash
 git clone https://github.com/danilbr235-beep/Soft.git
 cd Soft
 npm install
 ```
 
-## Usage
+## Running the Web Application
 
-Run the CLI script using Node.js (from within the repository):
+Start the Express server, which serves the API and static files in `/public`:
 
-```
-node index.js
-```
-
-You can also pass any number of numeric arguments to compute their sum:
-
-```
-node index.js 1 2 3
-# Output: Hello from the Soft project!
-#         Sum of provided numbers: 6
+```bash
+npm start
 ```
 
-Non‑numeric arguments are ignored with a warning.
+The server listens on port 3000 by default. Open your browser at [http://localhost:3000](http://localhost:3000) to access the web interface.
+
+The web interface allows you to:
+
+- Add a new goal.
+- View the list of existing goals.
+- Mark a goal as complete.
+- Delete a goal.
+
+All goals are stored in `goals.json`.
+
+## Using the CLI
+
+The CLI script (`index.js`) provides similar functionality via the terminal:
+
+```bash
+node index.js add "Learn Node.js"
+node index.js list
+node index.js complete 1
+node index.js delete 1
+```
+
+Pass `--help` to see usage instructions.
+
+## File Structure
+
+```
+app.js         # Express server and API routes
+goals.json     # JSON file used for storing goals
+index.js       # CLI script
+package.json   # Node.js package configuration
+public/
+  index.html   # Web page structure
+  styles.css   # Styling for the web interface
+  script.js    # Client-side logic for interacting with the API
+README.md      # This document
+```
+
+## License
+
+This project is licensed under the ISC License.
